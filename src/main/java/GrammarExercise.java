@@ -1,10 +1,9 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class GrammarExercise {
@@ -22,37 +21,21 @@ public class GrammarExercise {
     }
 
     public static List<String> findCommonWordsWithSpace(String firstWordList, String secondWordList) {
-        // 在这编写实现代码
-        List<String> sameWords = new ArrayList<>(16);
-        Map<String, Integer> wordsCount = new HashMap<>(16);
+        Set<String> firstSet = new HashSet<>(splitWords(firstWordList));
+        Set<String> secondSet = new HashSet<>(splitWords(secondWordList));
 
-        List<String> firstList = splitAndValidate(firstWordList);
-        List<String> secondList = splitAndValidate(secondWordList);
+        firstSet.retainAll(secondSet);
 
-        firstList.forEach(word -> wordsCount.put(word.toLowerCase(), 1));
-        secondList.forEach(word -> {
-            String lowerCaseWord = word.toLowerCase();
-            int count = wordsCount.getOrDefault(lowerCaseWord, 0);
-
-            if (count == 1) {
-                sameWords.add(lowerCaseWord);
-                wordsCount.put(lowerCaseWord, count + 1);
-            }
-        });
-
-        return sameWords.stream().sorted().map(GrammarExercise::formatWord).collect(Collectors.toList());
+        return firstSet.stream().sorted().collect(Collectors.toList());
     }
 
-    private static List<String> splitAndValidate(String wordsList) {
-        List<String> result = new ArrayList<>(16);
+    private static List<String> splitWords(String wordsList) {
         String[] splitedWords = wordsList.split(",");
 
-        Arrays.stream(splitedWords).forEach((word) -> {
+        return Arrays.stream(splitedWords).map((word) -> {
             validateWord(word);
-            result.add(word);
-        });
-
-        return result;
+            return formatWord(word);
+        }).collect(Collectors.toList());
     }
 
     private static void validateWord(String word) {
